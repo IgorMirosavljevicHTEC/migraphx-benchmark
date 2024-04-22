@@ -98,8 +98,8 @@ jobs:
           esac
           export GPU
           export CPU
-          echo "GPU: $GPU"
-          echo "CPU: $CPU"
+          echo "GPU=$GPU" >> $GITHUB_ENV
+          echo "CPU=$CPU" >> $GITHUB_ENV
           
       - name: Update Mailing list based on organization
         if: ${{ inputs.organization == 'HTEC' }}
@@ -144,7 +144,10 @@ jobs:
       - name: Run performance tests
         if: ${{ github.event.action != 'closed' }}
         run: >
-          docker run -e TZ=America/Chicago
+          docker run 
+          --cpuset-cpus=${{ env.CPU }}
+          -e ROCR_VISIBLE_DEVICES=${{ env.GPU }}
+          -e TZ=America/Chicago
           -e TARGET=gpu
           -e PYTHONPATH=/src/AMDMIGraphX/build/lib
           -e USE_RBUILD=1
