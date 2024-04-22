@@ -72,6 +72,35 @@ jobs:
     outputs:
       git_sha: ${{ steps.git_sha.outputs.git_sha }}
     steps:
+      - name: Get runner ID
+        run: |
+          case "$RUNNER_NAME" in
+            "MI250_0")
+              GPU=0
+              CPU="0-31"
+              ;;
+            "MI250_1")
+              GPU=0
+              CPU="32-63"
+              ;;
+            "MI250_2")
+              GPU=1
+              CPU="64-95"
+              ;;
+            "MI250_3")
+              GPU=1
+              CPU="96-127"
+              ;;
+            *)
+              echo "Unknown RUNNER_ID: $RUNNER_NAME"
+              exit 1
+              ;;
+          esac
+          export GPU
+          export CPU
+          echo "GPU: $GPU"
+          echo "CPU: $CPU"
+          
       - name: Update Mailing list based on organization
         if: ${{ inputs.organization == 'HTEC' }}
         run: |
