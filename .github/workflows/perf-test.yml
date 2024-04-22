@@ -146,6 +146,7 @@ jobs:
         run: >
           docker run 
           --cpuset-cpus=${{ env.CPU }}
+          --name MIGraphX-performance-test-${{ steps.git_sha.outputs.git_sha }}
           -e ROCR_VISIBLE_DEVICES=${{ env.GPU }}
           -e TZ=America/Chicago
           -e TARGET=gpu
