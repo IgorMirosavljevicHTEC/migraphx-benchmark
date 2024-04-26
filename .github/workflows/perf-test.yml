@@ -54,7 +54,7 @@ env:
   MAIL_TO: igor.mirosavljevic@htecgroup.com
   MAIL_CC: igor.mirosavljevic@htecgroup.com
   MAIL_FROM: GH Actions
-  MAIL_SUBJECT: Nightly Performance run
+  MAIL_SUBJECT: FORK Nightly Performance run
   MAIL_BODY: Scheduled Performance test run on develop branch
   PR_ID: ${{ github.event.number }}
   BRANCH_NAME: ${{ github.base_ref }}
