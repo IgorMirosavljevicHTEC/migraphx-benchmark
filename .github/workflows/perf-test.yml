@@ -211,7 +211,7 @@ jobs:
           git add .
           git config --local user.email github-actions@github.com
           git config --local user.name github-actions
-          git commit -m "Push report" -a
+          git commit -m "Performance results run https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" -a
           git push
 
       - name: Execute comment script
