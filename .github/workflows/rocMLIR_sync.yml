@@ -1,16 +1,36 @@
 name: rocMLIR main weekly sync
 
 on:
-  #schedule:
-    #- cron: '10 17 * * 5'
-    #- cron: '*/5 * * * *'
-  workflow_dispatch:
-  pull_request:
-    branches: [develop]
-    types: [synchronize, closed]
-
+  workflow_call:
+    inputs:
+      rocm_release:
+        type: string
+        description: ROCm release version
+        required: true
+      base_image:
+        type: string
+        description: Base image for rocm Docker build
+        required: true
+      docker_image:
+        type: string
+        description: Docker image name for rocm Docker build
+        required: true
+      build_navi:
+        type: string
+        description: Build navi number
+        required: true
+      benchmark_utils_repo:
+        type: string
+        description: Repository where benchmark utils are stored
+        required: true
+      organization:
+        type: string
+        description: Organization based on which location of files will be different
+        required: true
+        
 env:
   REPORTS_DIR: migraphx-reports
+  TEST_RESULTS_PATH: /usr/share/migraphx/${{ inputs.organization }}/test-results
   
 jobs:
   createPullRequest:
@@ -25,7 +45,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         run: echo rocmlirsha="$(git ls-remote https://github.com/ROCm/rocMLIR.git develop | awk '{print $1}')" >> $GITHUB_ENV
 
-      - name: Checkout code
+      - name: checkout_code
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         
@@ -35,7 +55,7 @@ jobs:
           sed -i "s/ROCm\/rocMLIR@[^ ]*/ROCm\/rocMLIR@${{ env.rocmlirsha }}/g" requirements.txt
           cat requirements.txt
 
-      - name: Make changes to pull request
+      - name: create_branch_and_pr
         if: ${{ github.event_name != 'pull_request' }}
         uses: peter-evans/create-pull-request@v6.0.4
         with:
@@ -66,34 +86,34 @@ jobs:
           draft: false
           base: develop
       
-      - name: Checkout code
+      - name: checkout_new_branch
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         with:
           ref: rocMLIR-sync-${{ env.todays_date }}
         
-      - name: Checkout utils
+      - name: checkout_utils
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         with:
-          repository: 'IgorMirosavljevicHTEC/migraphx-benchmark-utils'
+          repository: ${{ inputs.benchmark_utils_repo }}
           path: migraphx-benchmark-utils
           token: ${{ secrets.MIGRAPHX_BOT_TOKEN }}
           ref: main
           
-      - name: Rebuild base image
+      - name: rebuild_base_image
         if: ${{ github.event_name != 'pull_request' }}
         env:
-          ROCM_RELEASE: '6.0.2'
-          ROCM_BASE: 'rocm/dev-ubuntu-20.04:6.0.2'
-          DOCKERIMAGE: 'rocm-migraphx:6.0.2-temp'
-          BUILD_NAVI: '0'
+          ROCM_RELEASE: ${{ inputs.rocm_release }}
+          ROCM_BASE: ${{ inputs.base_image }}:${{ inputs.rocm_release }}
+          DOCKERIMAGE: ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp
+          BUILD_NAVI: ${{ inputs.build_navi }}
           TOKEN: ${{ secrets.MIGRAPHX_BOT_TOKEN }}
         run: |
           cd $GITHUB_WORKSPACE/migraphx-benchmark-utils/scripts
-          ./build_migraphx_docker.sh IgorMirosavljevicHTEC/migraphx-benchmark-utils IgorMirosavljevicHTEC/AMDMIGraphX rocMLIR-sync-${{ env.todays_date }}
+          ./build_migraphx_docker.sh ${{ inputs.benchmark_utils_repo }} $GITHUB_REPOSITORY rocMLIR-sync-${{ env.todays_date }}
 
-      - name: Build docker
+      - name: build_temp_docker
         if: ${{ github.event_name != 'pull_request' }}
         run: >
           cd $GITHUB_WORKSPACE && git fetch &&
@@ -101,17 +121,16 @@ jobs:
           cd $GITHUB_WORKSPACE/migraphx-benchmark-utils &&  
           docker build --no-cache
           --build-arg BRANCH=rocMLIR-sync-${{ env.todays_date }} 
-          --build-arg DOCKERBASE=rocm-migraphx:6.0.2-temp
-          --build-arg MIOPENTUNE=miopen-dbs/rocm6.0.2
-          --build-arg benchmark_utils_repo=IgorMirosavljevicHTEC/migraphx-benchmark-utils
-          -t "migraphx-rocm:6.0.2-rocMLIR" 
+          --build-arg DOCKERBASE=rocm-migraphx:${{ inputs.rocm_release }}-temp
+          --build-arg MIOPENTUNE=miopen-dbs/rocm${{ inputs.rocm_release }}
+          --build-arg benchmark_utils_repo=${{ inputs.benchmark_utils_repo }}
+          -t "migraphx-rocm:${{ inputs.rocm_release }}-rocMLIR" 
           -f dockerfiles/Daily.Dockerfile .
           
-      - name: Run extended accuracy test
+      - name: extended_accuracy_test
         if: ${{ github.event_name != 'pull_request' }}
         run: >
           docker run 
-          --name MIGraphX-extended-accuracy-test
           -e TZ=America/Chicago
           -e TARGET=gpu
           -e PYTHONPATH=/src/AMDMIGraphX/build/lib
@@ -125,46 +144,46 @@ jobs:
           -v $GITHUB_WORKSPACE/migraphx-benchmark-utils/scripts:/migraphx/sh:ro
           -v /usr/share/migraphx/AMD/test-results:/data/test-results
           --workdir /migraphx/sh
-          migraphx-rocm:6.0.2-rocMLIR /bin/bash -c "./build_migraphx.sh && ./accuracy_test-extended.sh"
+          migraphx-rocm:${{ inputs.rocm_release }}-rocMLIR /bin/bash -c "./build_migraphx.sh && ./accuracy_test-extended.sh"
           
-      - name: Get accuracy result
+      - name: get_accuracy_result
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          cd /usr/share/migraphx/AMD/test-results
+          cd ${{ env.TEST_RESULTS_PATH }}
           echo last_extended="$(ls -td extended_accuracy* | head -1)" >> $GITHUB_ENV
           echo comment_file="$(ls -td extended_accuracy* | head -1)/results.md" >> $GITHUB_ENV
 
-      - name: Checkout report's repo
+      - name: checkout_reports
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         with:
-          repository: IgorMirosavljevicHTEC/migraphx-reports
+          repository: ${{ inputs.benchmark_utils_repo }}
           path: ${{ env.REPORTS_DIR }}
           token: ${{ secrets.MIGRAPHX_BOT_TOKEN }}
         
-      - name: Push accuracy result to repo
+      - name: push_accuracy_to_repo
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          cd /usr/share/migraphx/AMD/test-results
+          cd ${{ env.TEST_RESULTS_PATH }}
           mkdir -p $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/extended_accuracy_reports/${{ env.todays_date }}
           cp -r ${{ env.last_extended }}/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/extended_accuracy_reports/${{ env.todays_date }}
           cd $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}
           git add .
           git config --local user.email github-actions@github.com
           git config --local user.name github-actions
-          git commit -m "Extended accuracy results" -a
+          git commit -m "Extended accuracy results for ${{ env.todays_date }}" -a
           git push
 
-      - name: Comment Pull Request
+      - name: comment_pr
         if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
-          filePath: /usr/share/migraphx/AMD/test-results/${{ env.comment_file }}
+          filePath: ${{ env.TEST_RESULTS_PATH }}/${{ env.comment_file }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           pr_number: ${{ env.PULL_REQUEST_NUMBER }}
 
-      - name: After merge
+      - name: replace_base_docker_on_merge
         if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'rocMLIR-sync-')
         run: |
-          echo "remove previous image"
-          docker tag rocm-migraphx:6.0.2-temp rocm-migraphx:6.0.2-updated
+          echo "remove previous image here and update name"
+          docker tag ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-updated
