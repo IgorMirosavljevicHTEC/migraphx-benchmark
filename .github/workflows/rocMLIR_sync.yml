@@ -25,6 +25,10 @@ on:
         type: string
         description: Repository where benchmark utils are stored
         required: true
+      performance_reports_repo:
+        type: string
+        description: Repository where performance reports are stored
+        required: true
       organization:
         type: string
         description: Organization based on which location of files will be different
