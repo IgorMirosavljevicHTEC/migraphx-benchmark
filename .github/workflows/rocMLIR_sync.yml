@@ -35,29 +35,29 @@ env:
   TEST_RESULTS_PATH: /usr/share/migraphx/${{ inputs.organization }}/test-results
   
 jobs:
-  createPullRequest:
-    name: Update and create pull request
+  sync_rocMLIR:
+    name: Sync rocMLIR and run extended accuracy
     runs-on: self-hosted
     steps:
-      - name: get_date
+      - name: Get date
         if: ${{ github.event_name != 'pull_request' }}
         run: echo todays_date="$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-      - name: extract_sha1 
+      - name: Extract SHA1 
         if: ${{ github.event_name != 'pull_request' }}
         run: echo rocmlirsha="$(git ls-remote https://github.com/ROCm/rocMLIR.git develop | awk '{print $1}')" >> $GITHUB_ENV
 
-      - name: checkout_code
+      - name: Checkout code
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         
-      - name: update_file
+      - name: Update file
         if: ${{ github.event_name != 'pull_request' }}
         run:  |
           sed -i "s/ROCm\/rocMLIR@[^ ]*/ROCm\/rocMLIR@${{ env.rocmlirsha }}/g" requirements.txt
           cat requirements.txt
 
-      - name: create_branch_and_pr
+      - name: Create branch and PR
         if: ${{ github.event_name != 'pull_request' }}
         uses: peter-evans/create-pull-request@v6.0.4
         with:
@@ -88,13 +88,13 @@ jobs:
           draft: false
           base: develop
       
-      - name: checkout_new_branch
+      - name: Checkout new branch
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         with:
           ref: rocMLIR-sync-${{ env.todays_date }}
         
-      - name: checkout_utils
+      - name: Checkout utils
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         with:
@@ -103,7 +103,7 @@ jobs:
           token: ${{ secrets.MIGRAPHX_BOT_TOKEN }}
           ref: main
           
-      - name: rebuild_base_image
+      - name: Rebuild base image
         if: ${{ github.event_name != 'pull_request' }}
         env:
           ROCM_RELEASE: ${{ inputs.rocm_release }}
@@ -115,7 +115,7 @@ jobs:
           cd $GITHUB_WORKSPACE/migraphx-benchmark-utils/scripts
           ./build_migraphx_docker.sh ${{ inputs.benchmark_utils_repo }} $GITHUB_REPOSITORY rocMLIR-sync-${{ env.todays_date }}
 
-      - name: build_temp_docker
+      - name: Build temp docker
         if: ${{ github.event_name != 'pull_request' }}
         run: >
           cd $GITHUB_WORKSPACE && git fetch &&
@@ -129,7 +129,7 @@ jobs:
           -t "migraphx-rocm:${{ inputs.rocm_release }}-rocMLIR" 
           -f dockerfiles/Daily.Dockerfile .
           
-      - name: extended_accuracy_test
+      - name: Run extended accuracy test
         if: ${{ github.event_name != 'pull_request' }}
         run: >
           docker run 
@@ -148,14 +148,14 @@ jobs:
           --workdir /migraphx/sh
           migraphx-rocm:${{ inputs.rocm_release }}-rocMLIR /bin/bash -c "./build_migraphx.sh && ./accuracy_test-extended.sh"
           
-      - name: get_accuracy_result
+      - name: Get accuracy result
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           cd ${{ env.TEST_RESULTS_PATH }}
           echo last_extended="$(ls -td extended_accuracy* | head -1)" >> $GITHUB_ENV
           echo comment_file="$(ls -td extended_accuracy* | head -1)/results.md" >> $GITHUB_ENV
 
-      - name: checkout_reports
+      - name: Checkout reports
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         with:
@@ -163,7 +163,7 @@ jobs:
           path: ${{ env.REPORTS_DIR }}
           token: ${{ secrets.MIGRAPHX_BOT_TOKEN }}
         
-      - name: push_accuracy_to_repo
+      - name: Push accuracy to repo
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           cd ${{ env.TEST_RESULTS_PATH }}
@@ -176,7 +176,7 @@ jobs:
           git commit -m "Extended accuracy results for ${{ env.todays_date }}" -a
           git push
 
-      - name: comment_pr
+      - name: Accuracy comment on PR
         if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
@@ -184,7 +184,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           pr_number: ${{ env.PULL_REQUEST_NUMBER }}
 
-      - name: replace_base_docker_on_merge
+      - name: Replace base docker after merge
         if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'rocMLIR-sync-')
         run: |
           echo "remove previous image here and update name"
