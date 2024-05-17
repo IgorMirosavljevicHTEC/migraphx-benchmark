@@ -104,6 +104,9 @@ jobs:
       - name: Set GPU parameters
         run: sudo rocm-smi --device ${{ env.GPU }} --setsrange 700 800 --autorespond y
       
+      - name: Install python libraries
+        run: pip install numpy pandas openpyxl
+        
       - name: Update Mailing list based on organization
         if: ${{ inputs.organization == 'HTEC' }}
         run: |
