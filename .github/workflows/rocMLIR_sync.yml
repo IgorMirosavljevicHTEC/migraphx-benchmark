@@ -1,5 +1,7 @@
 name: rocMLIR main weekly sync
-
+#UPDATE SECRET TOKEN
+#UPDATE PR REVIEWER/ASSIGNEE
+#UPDATE DOCKER REMOVE AFTER MERGE
 on:
   workflow_call:
     inputs:
