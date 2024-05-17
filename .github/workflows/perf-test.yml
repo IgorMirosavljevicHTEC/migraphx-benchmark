@@ -100,7 +100,10 @@ jobs:
           export CPU
           echo "GPU=$GPU" >> $GITHUB_ENV
           echo "CPU=$CPU" >> $GITHUB_ENV
-          
+      
+      - name: Set GPU parameters
+        run: sudo rocm-smi --device ${{ env.GPU }} --setsrange 700 800 --autorespond y
+      
       - name: Update Mailing list based on organization
         if: ${{ inputs.organization == 'HTEC' }}
         run: |
@@ -141,7 +144,6 @@ jobs:
           -t "migraphx-rocm:${{ inputs.rocm_release }}-${{ steps.git_sha.outputs.git_sha }}" 
           -f dockerfiles/Daily.Dockerfile .
 
-#          --name MIGraphX-performance-test-${{ steps.git_sha.outputs.git_sha }}
       - name: Run performance tests
         if: ${{ github.event.action != 'closed' }}
         run: >
