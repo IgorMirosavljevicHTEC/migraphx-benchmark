@@ -209,6 +209,7 @@ jobs:
           cp -r ${{ env.TEST_RESULTS_PATH }}/perf-*/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/PR-$PR_ID/${{ steps.git_sha.outputs.git_sha }}
       
       - name: Push results to repo
+        continue-on-error: true
         run: |
           cd $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/
           git add .
