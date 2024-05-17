@@ -181,11 +181,11 @@ jobs:
           git add .
           git config --local user.email github-actions@github.com
           git config --local user.name github-actions
-          git commit -m "Extended accuracy results for ${{ env.todays_date }}" -a
+          git commit -m "Extended accuracy results run https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" -a
           git push
 
       - name: Accuracy comment on PR
-        if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
+        if: ${{ github.event_name != 'pull_request' }}
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
           filePath: ${{ env.TEST_RESULTS_PATH }}/${{ env.comment_file }}
