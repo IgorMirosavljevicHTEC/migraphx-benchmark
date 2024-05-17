@@ -167,7 +167,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         with:
-          repository: ${{ inputs.benchmark_utils_repo }}
+          repository: ${{ inputs.performance_reports_repo }}
           path: ${{ env.REPORTS_DIR }}
           token: ${{ secrets.gh_token }}
         
