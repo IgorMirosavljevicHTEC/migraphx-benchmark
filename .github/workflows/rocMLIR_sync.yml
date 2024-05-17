@@ -33,6 +33,10 @@ on:
         type: string
         description: Organization based on which location of files will be different
         required: true
+    secrets:
+      gh_token:
+        description: 'Github Access Token'
+        required: true
         
 env:
   REPORTS_DIR: migraphx-reports
@@ -104,7 +108,7 @@ jobs:
         with:
           repository: ${{ inputs.benchmark_utils_repo }}
           path: migraphx-benchmark-utils
-          token: ${{ secrets.MIGRAPHX_BOT_TOKEN }}
+          token: ${{ secrets.gh_token }}
           ref: main
           
       - name: Rebuild base image
@@ -114,7 +118,7 @@ jobs:
           ROCM_BASE: ${{ inputs.base_image }}:${{ inputs.rocm_release }}
           DOCKERIMAGE: ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp
           BUILD_NAVI: ${{ inputs.build_navi }}
-          TOKEN: ${{ secrets.MIGRAPHX_BOT_TOKEN }}
+          TOKEN: ${{ secrets.gh_token }}
         run: |
           cd $GITHUB_WORKSPACE/migraphx-benchmark-utils/scripts
           ./build_migraphx_docker.sh ${{ inputs.benchmark_utils_repo }} $GITHUB_REPOSITORY rocMLIR-sync-${{ env.todays_date }}
@@ -165,7 +169,7 @@ jobs:
         with:
           repository: ${{ inputs.benchmark_utils_repo }}
           path: ${{ env.REPORTS_DIR }}
-          token: ${{ secrets.MIGRAPHX_BOT_TOKEN }}
+          token: ${{ secrets.gh_token }}
         
       - name: Push accuracy to repo
         if: ${{ github.event_name != 'pull_request' }}
@@ -185,7 +189,8 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
           filePath: ${{ env.TEST_RESULTS_PATH }}/${{ env.comment_file }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.gh_token }}
           pr_number: ${{ env.PULL_REQUEST_NUMBER }}
 
       - name: Replace base docker after merge
