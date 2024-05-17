@@ -196,8 +196,8 @@ jobs:
           -r '${{ env.REPORTS_PATH }}'
           cp -r ${{ env.REPORTS_PATH }}/results-* $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/
       
-      - name: Copy performance results to repo - nightly
-        if: ${{ github.event_name == 'schedule' }}
+      - name: Copy performance results to repo - develop - nightly or manual
+        if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
         run: |
           mkdir -p $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}
           cp -r ${{ env.TEST_RESULTS_PATH }}/perf-*/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}
