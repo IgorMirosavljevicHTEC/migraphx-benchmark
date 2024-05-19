@@ -50,7 +50,7 @@ jobs:
       - name: Check inputs
         run: |
           echo "ROCM:${{ inputs.rocm_release }}"
-          echo "BASE:${{ inputs.base_iamge }}"
+          echo "BASE:${{ inputs.base_image }}"
           echo "DOCKER:${{ inputs.docker_image }}"
           echo "NAVI:${{ inputs.build_navi }}"
           echo "UTILS:${{ inputs.benchmark_utils_repo }}"
