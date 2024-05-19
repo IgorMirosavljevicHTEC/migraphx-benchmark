@@ -47,6 +47,16 @@ jobs:
     name: Sync rocMLIR and run extended accuracy
     runs-on: self-hosted
     steps:
+      - name: Check inputs
+        run: |
+          echo "ROCM:${{ inputs.rocm_release }}"
+          echo "BASE:${{ inputs.base_iamge }}"
+          echo "DOCKER:${{ inputs.docker_image }}"
+          echo "NAVI:${{ inputs.build_navi }}"
+          echo "UTILS:${{ inputs.benchmark_utils_repo }}"
+          echo "REPORTS:${{ inputs.performance_reports_repo }}"
+          echo "ORG:${{ inputs.organization }}"
+          
       - name: Get date
         if: ${{ github.event_name != 'pull_request' }}
         run: echo todays_date="$(date +'%Y-%m-%d')" >> $GITHUB_ENV
