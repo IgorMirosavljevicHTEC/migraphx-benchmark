@@ -72,6 +72,17 @@ jobs:
     outputs:
       git_sha: ${{ steps.git_sha.outputs.git_sha }}
     steps:
+      - name: Check inputs
+        run: |
+          echo "ROCM:${{ inputs.rocm_release }}"
+          echo "REPORTS:${{ inputs.performance_reports_repo }}"
+          echo "UTILS:${{ inputs.benchmark_utils_repo }}"
+          echo "ORG:${{ inputs.organization }}"
+          echo "NO:${{ inputs.result_number }}"
+          echo "TO:${{ inputs.model_timeout }}"
+          echo "FLAGS:${{ inputs.flags }}"
+          echo "BACKUP:${{ inputs.performance_backup_repo }}"
+          
       - name: Get runner ID
         run: |
           case "$RUNNER_NAME" in
