@@ -208,6 +208,6 @@ jobs:
         run: |
           echo "remove previous image here and update name"
           docker image ls
-          docker tag ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-updated
-          echo "new image"
+          docker tag ${{ inputs.docker_image }}:${{ inputs.rocm_release }} ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-old
+          docker tag ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp ${{ inputs.docker_image }}:${{ inputs.rocm_release }}
           docker image ls
