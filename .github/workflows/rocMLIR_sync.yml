@@ -206,8 +206,12 @@ jobs:
       - name: Replace base docker after merge
         if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'rocMLIR-sync-')
         run: |
-          echo "remove previous image here and update name"
-          docker image ls
+          if [[ $(docker images --filter=reference="${{ inputs.docker_image }}:${{ inputs.rocm_release }}-old" | awk 'NR>1 {print $3}') ]]; then
+            docker rmi -f $(docker images --filter=reference="${{ inputs.docker_image }}:${{ inputs.rocm_release }}-old" | awk 'NR>1 {print $3}')
+            echo "Removed ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-old image"
+          fi
           docker tag ${{ inputs.docker_image }}:${{ inputs.rocm_release }} ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-old
+          echo "Current image ${{ inputs.docker_image }}:${{ inputs.rocm_release }} renamed to ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-old"
           docker tag ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp ${{ inputs.docker_image }}:${{ inputs.rocm_release }}
+          echo "Temp image ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp renamed to ${{ inputs.docker_image }}:${{ inputs.rocm_release }}"
           docker image ls
