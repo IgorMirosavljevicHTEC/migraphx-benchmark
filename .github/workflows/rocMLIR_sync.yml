@@ -215,4 +215,4 @@ jobs:
           echo "Current image ${{ inputs.docker_image }}:${{ inputs.rocm_release }} renamed to ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-old"
           docker tag ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp ${{ inputs.docker_image }}:${{ inputs.rocm_release }}
           echo "Temp image ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp renamed to ${{ inputs.docker_image }}:${{ inputs.rocm_release }}"
-          docker image ls
+          docker rmi ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-temp
