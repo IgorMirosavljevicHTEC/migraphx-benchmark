@@ -46,17 +46,7 @@ jobs:
   sync_rocMLIR:
     name: Sync rocMLIR and run extended accuracy
     runs-on: self-hosted
-    steps:
-      - name: Check inputs
-        run: |
-          echo "ROCM:${{ inputs.rocm_release }}"
-          echo "BASE:${{ inputs.base_image }}"
-          echo "DOCKER:${{ inputs.docker_image }}"
-          echo "NAVI:${{ inputs.build_navi }}"
-          echo "UTILS:${{ inputs.benchmark_utils_repo }}"
-          echo "REPORTS:${{ inputs.performance_reports_repo }}"
-          echo "ORG:${{ inputs.organization }}"
-          
+    steps:      
       - name: Get date
         if: ${{ github.event_name != 'pull_request' }}
         run: echo todays_date="$(date +'%Y-%m-%d')" >> $GITHUB_ENV
@@ -69,6 +59,18 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v4.1.1
         
+      - name: Check for changes
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          old_rocMLIR=$(grep ROCm/rocMLIR requirements.txt | grep -oP '(?<=@)[a-f0-9]{40}')
+          if [[ "old_rocMLIR" == ${{ env.rocmlirsha }} ]]; then
+            echo new_version='false' >> $GITHUB_ENV
+          else
+            echo new_version='true' >> $GITHUB_ENV
+          fi
+          echo "======"
+          echo ${{ env.new_version }}
+          
       - name: Update file
         if: ${{ github.event_name != 'pull_request' }}
         run:  |
