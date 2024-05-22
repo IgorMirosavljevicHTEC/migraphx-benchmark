@@ -63,18 +63,11 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           rocMLIR=$(grep ROCm/rocMLIR requirements.txt | grep -oP '(?<=@)[a-f0-9]{40}')
-          echo $rocMLIR
           if [ "${rocMLIR}" == ${{ env.rocmlirsha }} ]; then
             echo "skip=true" >> $GITHUB_ENV
           else
             echo "skip=false" >> $GITHUB_ENV
           fi
-          
-          echo "======"
-          echo "var:$rocMLIR"
-          echo "env:${{ env.rocMLIR }}"
-          echo "var:$skip"
-          echo "skip:${{ env.skip }}"
           
       - name: Test step true
         if: ${{ env.skip == 'true' }}
@@ -88,12 +81,12 @@ jobs:
           echo "FALSE"
           
       - name: Update file
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         run:  |
           sed -i "s/ROCm\/rocMLIR@[^ ]*/ROCm\/rocMLIR@${{ env.rocmlirsha }}/g" requirements.txt
 
       - name: Create branch and PR
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         uses: peter-evans/create-pull-request@v6.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -124,13 +117,13 @@ jobs:
           base: develop
       
       - name: Checkout new branch
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         uses: actions/checkout@v4.1.1
         with:
           ref: rocMLIR-sync-${{ env.todays_date }}
         
       - name: Checkout utils
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         uses: actions/checkout@v4.1.1
         with:
           repository: ${{ inputs.benchmark_utils_repo }}
@@ -139,7 +132,7 @@ jobs:
           ref: main
           
       - name: Rebuild base image
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         env:
           ROCM_RELEASE: ${{ inputs.rocm_release }}
           ROCM_BASE: ${{ inputs.base_image }}:${{ inputs.rocm_release }}
@@ -151,7 +144,7 @@ jobs:
           ./build_migraphx_docker.sh ${{ inputs.benchmark_utils_repo }} $GITHUB_REPOSITORY rocMLIR-sync-${{ env.todays_date }}
 
       - name: Build temp docker
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         run: >
           cd $GITHUB_WORKSPACE && git fetch &&
           git checkout rocMLIR-sync-${{ env.todays_date }} &&
@@ -165,7 +158,7 @@ jobs:
           -f dockerfiles/Daily.Dockerfile .
           
       - name: Run extended accuracy test
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         run: >
           docker run 
           -e TZ=America/Chicago
@@ -184,14 +177,14 @@ jobs:
           migraphx-rocm:${{ inputs.rocm_release }}-rocMLIR /bin/bash -c "./build_migraphx.sh && ./accuracy_test-extended.sh"
           
       - name: Get accuracy result
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         run: |
           cd ${{ env.TEST_RESULTS_PATH }}
           echo last_extended="$(ls -td extended_accuracy* | head -1)" >> $GITHUB_ENV
           echo comment_file="$(ls -td extended_accuracy* | head -1)/results.md" >> $GITHUB_ENV
 
       - name: Checkout reports
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         uses: actions/checkout@v4.1.1
         with:
           repository: ${{ inputs.performance_reports_repo }}
@@ -199,7 +192,7 @@ jobs:
           token: ${{ secrets.gh_token }}
         
       - name: Push accuracy to repo
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         run: |
           cd ${{ env.TEST_RESULTS_PATH }}
           mkdir -p $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/extended_accuracy_reports/${{ env.todays_date }}
@@ -212,7 +205,7 @@ jobs:
           git push
 
       - name: Accuracy comment on PR
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         uses: thollander/actions-comment-pull-request@v2.5.0
         with:
           filePath: ${{ env.TEST_RESULTS_PATH }}/${{ env.comment_file }}
