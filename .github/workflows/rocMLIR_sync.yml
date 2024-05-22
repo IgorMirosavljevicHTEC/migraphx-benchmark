@@ -62,20 +62,19 @@ jobs:
       - name: Check for changes
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          old_rocMLIR=$(grep ROCm/rocMLIR requirements.txt | grep -oP '(?<=@)[a-f0-9]{40}')
-          if [[ "old_rocMLIR" == ${{ env.rocmlirsha }} ]]; then
-            echo new_version='false' >> $GITHUB_ENV
+          rocMLIR=$(grep ROCm/rocMLIR requirements.txt | grep -oP '(?<=@)[a-f0-9]{40}')
+          if [[ "$rocMLIR" == ${{ env.rocmlirsha }} ]]; then
+            echo "skip=true" >> $GITHUB_ENV
           else
-            echo new_version='true' >> $GITHUB_ENV
+            echo "skip=false" >> $GITHUB_ENV
           fi
           echo "======"
-          echo ${{ env.new_version }}
+          echo ${{ env.skip }}
           
       - name: Update file
         if: ${{ github.event_name != 'pull_request' }}
         run:  |
           sed -i "s/ROCm\/rocMLIR@[^ ]*/ROCm\/rocMLIR@${{ env.rocmlirsha }}/g" requirements.txt
-          cat requirements.txt
 
       - name: Create branch and PR
         if: ${{ github.event_name != 'pull_request' }}
