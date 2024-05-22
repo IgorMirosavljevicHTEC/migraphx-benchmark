@@ -62,14 +62,16 @@ jobs:
       - name: Check for changes
         if: ${{ github.event_name != 'pull_request' }}
         run: |
-          rocMLIR=$(grep ROCm/rocMLIR requirements.txt | grep -oP '(?<=@)[a-f0-9]{40}')
+          rocMLIR=$(grep ROCm/rocMLIR requirements.txt | grep -oP '(?<=@)[a-f0-9]{40}') 
+          echo $rocMLIR
           if [[ "$rocMLIR" == ${{ env.rocmlirsha }} ]]; then
             echo "skip=true" >> $GITHUB_ENV
           else
             echo "skip=false" >> $GITHUB_ENV
           fi
           echo "======"
-          echo ${{ env.skip }}
+          echo "var:$rocMLIR"
+          echo "env:${{ env.skip }}"
           
       - name: Update file
         if: ${{ github.event_name != 'pull_request' }}
