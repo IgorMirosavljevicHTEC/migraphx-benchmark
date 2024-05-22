@@ -71,7 +71,8 @@ jobs:
           fi
           echo "======"
           echo "var:$rocMLIR"
-          echo "env:${{ env.skip }}"
+          echo "env:${{ env.rocMLIR }}"
+          echo "skip:${{ env.skip }}"
           
       - name: Update file
         if: ${{ github.event_name != 'pull_request' }}
