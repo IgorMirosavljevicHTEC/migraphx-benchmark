@@ -68,6 +68,7 @@ jobs:
             echo "skip=true" >> $GITHUB_ENV
           else
             echo "skip=false" >> $GITHUB_ENV
+          fi
           
           echo "======"
           echo "var:$rocMLIR"
