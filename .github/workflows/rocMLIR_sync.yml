@@ -64,6 +64,8 @@ jobs:
         run: |
           rocMLIR=$(grep ROCm/rocMLIR requirements.txt | grep -oP '(?<=@)[a-f0-9]{40}') 
           echo $rocMLIR
+          [[ "${rocMLIR}" == ${{ env.rocmlirsha }} ]] && skip=true >> $GITHUB_ENV || skip=false >> $GITHUB_ENV
+          
           if [[ "$rocMLIR" == ${{ env.rocmlirsha }} ]]; then
             echo "skip=true" >> $GITHUB_ENV
           else
@@ -72,6 +74,7 @@ jobs:
           echo "======"
           echo "var:$rocMLIR"
           echo "env:${{ env.rocMLIR }}"
+          echo "var:$skip"
           echo "skip:${{ env.skip }}"
           
       - name: Update file
