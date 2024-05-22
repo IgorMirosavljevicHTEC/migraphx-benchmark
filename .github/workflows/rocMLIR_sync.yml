@@ -69,17 +69,6 @@ jobs:
             echo "skip=false" >> $GITHUB_ENV
           fi
           
-      - name: Test step true
-        if: ${{ env.skip == 'true' }}
-        run: |
-          echo ${{ env.rocMLIR }}
-          echo "TRUE"
-      - name: Test step false
-        if: ${{ env.skip == 'false' }}
-        run: |
-          echo ${{ env.rocMLIR }}
-          echo "FALSE"
-          
       - name: Update file
         if: ${{ github.event_name != 'pull_request' && env.skip != 'true' }}
         run:  |
