@@ -1,7 +1,7 @@
 name: rocMLIR sync with extended accuracy
 #UPDATE SECRET TOKEN
 #UPDATE PR REVIEWER/ASSIGNEE
-#UPDATE DOCKER REMOVE AFTER MERGE
+
 on:
   workflow_call:
     inputs:
@@ -71,6 +71,16 @@ jobs:
           echo "env:${{ env.rocMLIR }}"
           echo "var:$skip"
           echo "skip:${{ env.skip }}"
+      - name: Test step true
+        if: ${{ env.rocMLIR == 'true' }}
+        run: |
+          echo ${{ env.rocMLIR }}
+          echo "TRUE"
+      - name: Test step false
+        if: ${{ env.rocMLIR == 'false' }}
+        run: |
+          echo ${{ env.rocMLIR }}
+          echo "FALSE"
           
       - name: Update file
         if: ${{ github.event_name != 'pull_request' }}
