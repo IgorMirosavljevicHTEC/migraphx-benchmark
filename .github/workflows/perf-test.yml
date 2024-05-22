@@ -58,6 +58,7 @@ env:
   MAIL_BODY: Scheduled Performance test run on develop branch
   PR_ID: ${{ github.event.number }}
   BRANCH_NAME: develop
+  TEST_BRANCH: ${{ github.base_ref }}
   REPORTS_PATH: /usr/share/migraphx/${{ inputs.organization }}/reports
   TEST_RESULTS_PATH: /usr/share/migraphx/${{ inputs.organization }}/test-results
   MIGRAPHX_PATH: /usr/share/migraphx/${{ inputs.organization }}
@@ -72,6 +73,10 @@ jobs:
     outputs:
       git_sha: ${{ steps.git_sha.outputs.git_sha }}
     steps:     
+      - name: Check branch
+        run: |
+          echo "e: ${{ env.BRANCH_NAME }}"
+          echo "g: ${{ github.base_ref }}"
       - name: Get runner ID
         run: |
           case "$RUNNER_NAME" in
