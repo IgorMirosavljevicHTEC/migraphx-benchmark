@@ -73,10 +73,10 @@ jobs:
     outputs:
       git_sha: ${{ steps.git_sha.outputs.git_sha }}
     steps:     
-      - name: Check branch
+      - name: Get runner info
         run: |
-          echo "e: ${{ env.BRANCH_NAME }}"
-          echo "g: ${{ github.base_ref }}"
+          echo "n: ${{ runner.name }}"
+          echo "l: ${{ runner.labels }}"
       - name: Get runner ID
         run: |
           case "$RUNNER_NAME" in
