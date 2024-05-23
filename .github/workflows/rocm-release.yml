@@ -67,6 +67,7 @@ jobs:
           repository: ${{ inputs.benchmark-utils_repo }}
           path: ${{ env.UTILS_DIR }}
           token: ${{ secrets.gh_token }}
+          ref: main
 
       - name: Docker build
         env:
