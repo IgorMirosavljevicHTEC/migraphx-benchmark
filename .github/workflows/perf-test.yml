@@ -49,7 +49,7 @@ on:
 env:
   UTILS_DIR: benchmark-utils
   REPORTS_DIR: migraphx-reports
-  DOCKERBASE: rocm-migraphx:${{ inputs.rocm_release }}
+  DOCKERBASE: rocm-migraphx:${{ inputs.rocm_release }}-htec
   MIOPENTUNE: miopen-dbs/rocm${{ inputs.rocm_release }}
   MAIL_TO: igor.mirosavljevic@htecgroup.com
   MAIL_CC: igor.mirosavljevic@htecgroup.com
@@ -73,16 +73,16 @@ jobs:
     outputs:
       git_sha: ${{ steps.git_sha.outputs.git_sha }}
     steps:     
-      - name: Get runner info
+      - name: Get branch info
         run: |
-          echo "n: ${{ runner.name }}"
-          echo "l: ${{ runner.labels }}"
+          echo "branch: ${{ env.BRANCH_NAME }}"
+
       - name: Get runner ID
         run: |
           case "$RUNNER_NAME" in
             "MI250_0")
               GPU=0
-              CPU="0-31"
+              CPU="0-63"
               ;;
             "MI250_1")
               GPU=2
