@@ -41,7 +41,7 @@ env:
 jobs:
   check_image_version:
     name: Check Image Version
-    runs-on: self-hosted
+    runs-on: [self-hosted,rocm]
     outputs:
       image: ${{ steps.check_image.outputs.image }}
     steps:
