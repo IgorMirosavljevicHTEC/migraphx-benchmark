@@ -76,7 +76,6 @@ jobs:
       - name: Get branch info
         run: |
           echo "branch: ${GITHUB_REF##*/}"
-          echo "b2: ${{GITHUB_REF##*/}}"
           
       - name: Get runner ID
         run: |
