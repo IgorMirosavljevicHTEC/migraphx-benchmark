@@ -18,6 +18,10 @@ on:
         type: string
         description: Docker image name for rocm Docker build
         required: true
+      branch_name:
+        type: string
+        description: branch to use for building base ROCm image
+        required: true
       build_navi:
         type: string
         description: Build navi number
@@ -67,7 +71,6 @@ jobs:
           repository: ${{ inputs.benchmark-utils_repo }}
           path: ${{ env.UTILS_DIR }}
           token: ${{ secrets.gh_token }}
-          ref: main
 
       - name: Docker build
         env:
@@ -78,4 +81,4 @@ jobs:
           TOKEN: ${{ secrets.gh_token }}
         run: |
           cd $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts
-          ./build_migraphx_docker.sh ${{ inputs.benchmark-utils_repo }} ${{ github.repository }} ${GITHUB_REF##*/}
+          ./build_migraphx_docker.sh ${{ inputs.benchmark-utils_repo }} ${{ github.repository }} ${{ inputs.branch_name }}
