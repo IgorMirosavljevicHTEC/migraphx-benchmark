@@ -72,9 +72,9 @@ jobs:
         env:
           ROCM_RELEASE: ${{ inputs.rocm_release }}
           ROCM_BASE: ${{ inputs.base_image }}:${{ inputs.rocm_release }}
-          DOCKERIMAGE: ${{ inputs.docker_image }}:${{ inputs.rocm_release }}
+          DOCKERIMAGE: ${{ inputs.docker_image }}:${{ inputs.rocm_release }}-htec-test
           BUILD_NAVI: ${{ inputs.build_navi }}
           TOKEN: ${{ secrets.gh_token }}
         run: |
           cd $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts
-          ./build_migraphx_docker.sh ${{ inputs.benchmark-utils_repo }}
+          ./build_migraphx_docker.sh ${{ inputs.benchmark-utils_repo }} ${{ github.repository }} ${GITHUB_REF##*/}
