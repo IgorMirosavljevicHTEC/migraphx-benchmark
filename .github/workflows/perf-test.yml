@@ -75,15 +75,12 @@ jobs:
     steps: 
       - name: Clean up canceled runs
         run: |
-          echo ${{ github.workflow }}
-          echo ${{ github.api_url }}
           wf_id=$(curl -H "Authorization: token ${{ secrets.gh_token }}" \
-          https://api.github.com/repos/${{ github.repository }}/actions/workflows \
+          ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows \
           | jq -r '.workflows[] | {id, name}| select(.name == "${{ github.workflow }}") | .id')
-          echo $wf_id
           cancel_id=$(curl -s -H "Authorization: token ${{ secrets.gh_token }}" \
           -H "Accept: application/vnd.github.v3+json" \
-          "https://api.github.com/repos/${{ github.repository }}/actions/workflows/65602959/runs?per_page=10" \
+          "${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/$wf_id/runs?per_page=10" \
           | jq -r '.workflow_runs[] | {id, run_number, conclusion} | select(.conclusion == "cancelled") | {id, run_number}' | jq -n 'input | .id')
           docker stop perf-test-$cancel_id || true
       - name: Get branch info
