@@ -79,8 +79,7 @@ jobs:
           cancel_id=$(curl -s -H "Authorization: token ${{ secrets.gh_token }}" \
           -H "Accept: application/vnd.github.v3+json" \
           "https://api.github.com/repos/${{ github.repository }}/actions/workflows/65602959/runs?per_page=10" \
-          | jq -r '.workflow_runs[] | {id, run_number, conclusion} | select(.conclusion == "cancelled") \
-          | {id, run_number}' | jq -n 'input | .id')
+          | jq -r '.workflow_runs[] | {id, run_number, conclusion} | select(.conclusion == "cancelled") | {id, run_number}' | jq -n 'input | .id')
           docker stop perf-test-$cancel_id || true
       - name: Get branch info
         run: |
