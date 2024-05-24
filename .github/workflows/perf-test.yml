@@ -76,7 +76,10 @@ jobs:
       - name: Clean up canceled runs
         run: |
           echo ${{ github.workflow }}
-          wf_id=$(curl -H "Authorization: token ${{ secrets.gh_token }}" https://api.github.com/repos/${{ github.repository }}/actions/workflows | jq -r '.workflows[] | {id, name}| select(.name == "MIGraphX Performance Tests") | .id')
+          echo ${{ github.api_url }}
+          wf_id=$(curl -H "Authorization: token ${{ secrets.gh_token }}" \
+          https://api.github.com/repos/${{ github.repository }}/actions/workflows \
+          | jq -r '.workflows[] | {id, name}| select(.name == "${{ github.workflow }}") | .id')
           echo $wf_id
           cancel_id=$(curl -s -H "Authorization: token ${{ secrets.gh_token }}" \
           -H "Accept: application/vnd.github.v3+json" \
