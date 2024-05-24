@@ -75,7 +75,7 @@ jobs:
     steps: 
       - name: Clean up canceled runs
         run: |
-          curl_command="curl -H "Authorization: token ${{ secrets.gh_token }}" \
+          curl_command="curl -H \"Authorization: token ${{ secrets.gh_token }}\" \
           ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows"
           wf_id=$($curl_command | jq -r '.workflows[] | {id, name}| select(.name == "${{ github.workflow }}") | .id')
           cancel_id=$($curl_command/$wf_id/runs?per_page=10" \
