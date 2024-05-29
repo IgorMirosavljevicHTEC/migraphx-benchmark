@@ -187,11 +187,11 @@ jobs:
       - name: Delete old images/containers
         if: ${{ github.event_name == 'schedule' }}
         run: |
-          docker container prune -f
+          docker container prune -f || true
           if [[ $(docker images --filter=reference="migraphx-rocm:${{ inputs.rocm_release }}-*" | awk 'NR>1 {print $3}') ]]; then
             docker rmi -f $(docker images --filter=reference="migraphx-rocm:${{ inputs.rocm_release }}-*" | awk 'NR>1 {print $3}')
           fi
-          docker image prune -f
+          docker image prune -f || true
 
       - name: Checkout report's repo
         #if: ${{ github.event_name == 'schedule' }}
@@ -210,7 +210,7 @@ jobs:
           python3 $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/history.py -n \
           -t '${{ env.TEST_RESULTS_PATH }}' \
           -r '${{ env.REPORTS_PATH }}'
-          cp -r ${{ env.REPORTS_PATH }}/results-* $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/
+          cp -r ${{ env.REPORTS_PATH }}/results-* $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/nightly_reports
       
       - name: Copy performance results to repo - develop - nightly or manual
         if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
