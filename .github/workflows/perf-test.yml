@@ -169,11 +169,13 @@ jobs:
       - name: SHA
         run: |
           echo "trigger SHA: $GITHUB_SHA"
-          # echo "detils:"
-          # git show $GITHUB_SHA
-          echo "get merged"
           git log | head -5
           git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6
+          commit_id=$(git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
+          if [ -z "$commit_id" ]; then
+            commit_id=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
+          fi
+          echo $commit_id
 
 
       - name: Docker build
