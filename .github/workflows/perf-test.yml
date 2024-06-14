@@ -161,6 +161,7 @@ jobs:
         id: git_sha
         run: |
           cd $GITHUB_WORKSPACE
+          git checkout $BRANCH_NAME
           SHA=$(git log | head -1 | awk '{print $2}' | cut -c 1-6)
           echo "git_sha=$SHA" >> $GITHUB_OUTPUT
 
