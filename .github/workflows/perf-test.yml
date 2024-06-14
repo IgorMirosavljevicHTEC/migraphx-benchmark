@@ -78,13 +78,21 @@ jobs:
           wf_id=$(curl -H "Authorization: token ${{ secrets.gh_token }}" \
           ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows \
           | jq -r '.workflows[] | {id, name}| select(.name == "${{ github.workflow }}") | .id')
-          for i in 0 1 2; do
-            cancel_id=$(curl -H "Authorization: token ${{ secrets.gh_token }}" \
-            ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/$wf_id/runs?per_page=1 \
-            | jq -r '.workflow_runs[] | {id, run_number, conclusion} | select(.conclusion == "cancelled") | {id, run_number}' \
-            | jq -s ".[$i].id" || true)
-            docker stop perf-test-$cancel_id || true
-          done
+          cancel_id=$(curl -H "Authorization: token ${{ secrets.gh_token }}" \
+          ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/$wf_id/runs?per_page=10 \
+          | jq -r '.workflow_runs[] | {id, run_number, conclusion} | select(.conclusion == "cancelled") | {id, run_number}' \
+          | jq -s '.[0].id' || true)
+          docker stop perf-test-$cancel_id || true
+          cancel_id=$(curl -H "Authorization: token ${{ secrets.gh_token }}" \
+          ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/$wf_id/runs?per_page=10 \
+          | jq -r '.workflow_runs[] | {id, run_number, conclusion} | select(.conclusion == "cancelled") | {id, run_number}' \
+          | jq -s '.[1].id' || true)
+          docker stop perf-test-$cancel_id || true
+          cancel_id=$(curl -H "Authorization: token ${{ secrets.gh_token }}" \
+          ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/$wf_id/runs?per_page=10 \
+          | jq -r '.workflow_runs[] | {id, run_number, conclusion} | select(.conclusion == "cancelled") | {id, run_number}' \
+          | jq -s '.[2].id' || true)
+          docker stop perf-test-$cancel_id || true
 
       - name: Get branch info
         run: |
