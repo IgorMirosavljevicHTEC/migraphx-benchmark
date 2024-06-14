@@ -161,9 +161,11 @@ jobs:
         id: git_sha
         run: |
           cd $GITHUB_WORKSPACE
-          echo ${{ github.head_ref }}
-          SHA=$(git log | head -1 | awk '{print $2}' | cut -c 1-6)
-          echo $SHA
+          #SHA=$(git log | head -1 | awk '{print $2}' | cut -c 1-6)
+          SHA=$(git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
+          if [ -z "$SHA" ]; then
+            SHA=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
+          fi
           echo "git_sha=$SHA" >> $GITHUB_OUTPUT
       
       - name: SHA
