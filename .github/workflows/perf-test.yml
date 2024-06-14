@@ -173,10 +173,10 @@ jobs:
           # git show $GITHUB_SHA
           echo "get merged"
           git log | head -5
-          echo "parent1:"
-          git rev-parse $GITHUB_SHA^1
-          echo "parent2:"
-          git rev-parse $GITHUB_SHA^2
+          # echo "parent1:"
+          # git rev-parse $GITHUB_SHA^1
+          # echo "parent2:"
+          # git rev-parse $GITHUB_SHA^2
           echo "list commits with parents"
           git rev-list --parents -n 1 $GITHUB_SHA
 
