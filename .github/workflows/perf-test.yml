@@ -90,7 +90,7 @@ jobs:
         run: |
           echo "branch: ${GITHUB_REF##*/}"
           echo "PR: ${PR_ID}"
-          echo "PR2: $PR_ID
+          echo "PR2: $PR_ID"
           
       - name: Get runner ID
         run: |
