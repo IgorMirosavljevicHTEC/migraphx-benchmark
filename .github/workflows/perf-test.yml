@@ -165,6 +165,18 @@ jobs:
           SHA=$(git log | head -1 | awk '{print $2}' | cut -c 1-6)
           echo $SHA
           echo "git_sha=$SHA" >> $GITHUB_OUTPUT
+      
+      - name: SHA
+        run: |
+          echo "trigger SHA: $GITHUB_SHA"
+          echo "detils:"
+          git show $GITHUB_SHA
+          echo "parent1:"
+          git rev-parse $GITHUB_SHA^1
+          echo "parent2:"
+          git rev-parse $GITHUB_SHA^2
+          echo "list commits with parents"
+          git rev-list --parents -n 1 $GITHUB_SHA
 
       - name: Docker build
         if: ${{ github.event.action != 'closed' }}
