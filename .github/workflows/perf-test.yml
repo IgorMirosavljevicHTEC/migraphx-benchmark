@@ -119,6 +119,10 @@ jobs:
               GPU=6
               CPU="96-127"
               ;;
+            "ixt-rack-176")
+              GPU=0
+              CPU="0-31"
+              ;;
             *)
               echo "Unknown RUNNER_ID: $RUNNER_NAME"
               exit 1
