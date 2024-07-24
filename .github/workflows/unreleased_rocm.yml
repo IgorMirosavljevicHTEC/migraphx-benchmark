@@ -185,27 +185,27 @@ jobs:
       #    -t "migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }}" 
       #    -f dockerfiles/Daily.Dockerfile .
 
-      #- name: Run performance tests
-      #  run: >
-      #    docker run -e TZ=America/Chicago
-      #    --name perf-test-$GITHUB_RUN_ID
-      #    --cpuset-cpus=${{ env.CPU }}
-      #    -e ROCR_VISIBLE_DEVICES=${{ env.GPU }}
-      #    -e TARGET=gpu
-      #    -e PYTHONPATH=/src/AMDMIGraphX/build/lib
-      #    -e USE_RBUILD=1
-      #    -e TEST_RESULTDIR=/data/test-results/unreleased-rocm
-      #    -e TEST_RESULTS_PATH=/data/test-results/unreleased-rocm
-      #    --device=/dev/dri
-      #    --device=/dev/kfd
-      #    --network=host
-      #    --group-add=video
-      #    -v /usr/share/migraphx/saved-models:/saved-models:ro
-      #    -v /usr/share/migraphx/new-saved-models:/new-saved-models:ro
-      #    -v $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts:/migraphx/sh:ro
-      #    -v ${{ env.TEST_RESULTS_PATH }}:/data/test-results/unreleased-rocm
-      #    --workdir /migraphx/sh
-      #    migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }} /bin/bash -c "./build_migraphx.sh && ./performance_tests.sh ${{ inputs.model_timeout }}"
+      - name: Run performance tests
+        run: >
+          docker run -e TZ=America/Chicago
+          --name perf-test-$GITHUB_RUN_ID
+          --cpuset-cpus=${{ env.CPU }}
+          -e ROCR_VISIBLE_DEVICES=${{ env.GPU }}
+          -e TARGET=gpu
+          -e PYTHONPATH=/src/AMDMIGraphX/build/lib
+          -e USE_RBUILD=1
+          -e TEST_RESULTDIR=/data/test-results/unreleased-rocm
+          -e TEST_RESULTS_PATH=/data/test-results/unreleased-rocm
+          --device=/dev/dri
+          --device=/dev/kfd
+          --network=host
+          --group-add=video
+          -v /usr/share/migraphx/saved-models:/saved-models:ro
+          -v /usr/share/migraphx/new-saved-models:/new-saved-models:ro
+          -v $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts:/migraphx/sh:ro
+          -v ${{ env.TEST_RESULTS_PATH }}:/data/test-results/unreleased-rocm
+          --workdir /migraphx/sh
+          migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }} /bin/bash -c "./build_migraphx.sh && ./performance_tests.sh ${{ inputs.model_timeout }}"
 
       #- name: Checkout report's repo
       #  uses: actions/checkout@v4.1.1
