@@ -59,7 +59,7 @@ env:
   MAIL_CC: igor.mirosavljevic@htecgroup.com
   MAIL_FROM: GH Actions
   MAIL_SUBJECT: Unreleased ROCm ${{ inputs.unreleased_rocm }} test
-  MAIL_BODY: Performance test with unreleased ROCm for run https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+  MAIL_BODY: Performance test with unreleased ROCm for run https://github.com/${{ github.repository }}/actions/runs/${{github.run_id }}
   BRANCH_NAME: develop
   REPORTS_PATH: /usr/share/migraphx/${{ inputs.organization }}/reports
   TEST_RESULTS_PATH: /usr/share/migraphx/${{ inputs.organization }}/test-results/unreleased_ROCm
