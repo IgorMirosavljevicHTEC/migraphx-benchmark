@@ -99,9 +99,9 @@ jobs:
       - name: Get runner ID
         run: |
           case "$RUNNER_NAME" in
-            "GPUD55F_1")
+            "ixt-rack-176")
               GPU=0
-              CPU="0-63"
+              CPU="0-31"
               ;;
             "GPUD55F_2")
               GPU=4
