@@ -237,6 +237,7 @@ jobs:
             flagoptions="${{ inputs.flags }}"
           fi 
           python3 $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/comment.py -t ${TEST_RESULTS_PATH} -n ${{ inputs.result_number }} $flagoptions -p
+          mv $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/temp.md $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/performance.md
 
       - name: Get latest accuracy results
         id: accuracy
@@ -244,6 +245,7 @@ jobs:
           cd ${{ env.TEST_RESULTS_PATH }}
           ACCURACY=$(ls -dt accuracy* | head -1)
           echo "last_test=$ACCURACY" >> $GITHUB_OUTPUT
+          mv ${{ env.TEST_RESULTS_PATH }}/$ACCURACY/results.md ${{ env.TEST_RESULTS_PATH }}/$ACCURACY/accuracy.md
 
       - name: Get latest report
         id: last_report
@@ -266,7 +268,7 @@ jobs:
           body: ${{ env.MAIL_BODY }}
           cc: ${{ env.MAIL_CC }}
           ignore_cert: true
-          attachments: ${{ github.workspace }}/${{ env.UTILS_DIR }}/scripts/temp.md,${{ env.TEST_RESULTS_PATH }}/${{ steps.accuracy.outputs.last_test }}/results.md
+          attachments: ${{ github.workspace }}/${{ env.UTILS_DIR }}/scripts/performance.md,${{ env.TEST_RESULTS_PATH }}/${{ steps.accuracy.outputs.last_test }}/accuracy.md
           priority: normal
 
       - name: Reset GPU parameters to default
