@@ -151,14 +151,17 @@ jobs:
       
       - name: Update Dockerfile
         run: |
-          cd $GITHUB_WORKSPACE/AMDMIGraphX
+          cd $GITHUB_WORKSPACE
+          pwd
+          ls
           UNRELEASED=${{inputs.unreleased_rocm}}
           ROCM_VERSION=".apt_$UNRELEASED"
+          echo $ROCM_VERSION
           sed -i "s|\(http://repo.radeon.com/rocm/apt/\)[^/]*\(/ jammy main > /etc/apt/sources.list.d/rocm.list\)|\1$ROCM_VERSION\2|g" Dockerfile    
       
       - name: ROCm base build
         run: |
-          cd $GITHUB_WORKSPACE/AMDMIGraphX
+          cd $GITHUB_WORKSPACE
           docker build -t unreleased_rocm:${{inputs.unreleased_rocm}} .
       
       - name: Build upon ROCm base
@@ -179,7 +182,7 @@ jobs:
           --build-arg DOCKERBASE=${{ env.DOCKERBASE }}
           --build-arg MIOPENTUNE=${{ env.MIOPENTUNE }}
           --build-arg benchmark_utils_repo=${{ inputs.benchmark_utils_repo }}
-          -t "migraphx-rocm:${{ inputs.rocm_release }}-${{ steps.git_sha.outputs.git_sha }}" 
+          -t "migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }}" 
           -f dockerfiles/Daily.Dockerfile .
 
       - name: Run performance tests
@@ -201,7 +204,7 @@ jobs:
           -v $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts:/migraphx/sh:ro
           -v ${{ env.TEST_RESULTS_PATH }}:/data/test-results/unreleased-rocm
           --workdir /migraphx/sh
-          migraphx-rocm:${{ inputs.rocm_release }}-${{ steps.git_sha.outputs.git_sha }} /bin/bash -c "./build_migraphx.sh && ./performance_tests.sh ${{ inputs.model_timeout }}"
+          migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }} /bin/bash -c "./build_migraphx.sh && ./performance_tests.sh ${{ inputs.model_timeout }}"
 
       - name: Checkout report's repo
         uses: actions/checkout@v4.1.1
