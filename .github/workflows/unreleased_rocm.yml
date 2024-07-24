@@ -233,6 +233,7 @@ jobs:
         id: auto_comment
         run: |
           echo ${TEST_RESULTS_PATH}
+          ls ${TEST_RESULTS_PATH}
           if [ ${{ inputs.flags }} == "-r" ]; then
             flagoptions="${{ inputs.flags }} $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/"
           else
