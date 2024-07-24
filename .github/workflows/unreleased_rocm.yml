@@ -196,6 +196,7 @@ jobs:
           -e USE_RBUILD=1
           -e TEST_RESULTDIR=/data/test-results/unreleased-rocm
           -e TEST_RESULTS_PATH=/data/test-results/unreleased-rocm
+          -e TARGETOPT="--gpu --exhaustive-tune"
           --device=/dev/dri
           --device=/dev/kfd
           --network=host
