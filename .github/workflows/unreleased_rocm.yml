@@ -232,8 +232,6 @@ jobs:
       - name: Execute comment script
         id: auto_comment
         run: |
-          echo ${TEST_RESULTS_PATH}
-          ls ${TEST_RESULTS_PATH}
           if [ ${{ inputs.flags }} == "-r" ]; then
             flagoptions="${{ inputs.flags }} $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/"
           else
@@ -249,13 +247,6 @@ jobs:
           ACCURACY=$(ls -dt accuracy* | head -1)
           echo "last_test=$ACCURACY" >> $GITHUB_OUTPUT
           sudo mv ${{ env.TEST_RESULTS_PATH }}/$ACCURACY/results.md ${{ env.TEST_RESULTS_PATH }}/$ACCURACY/accuracy.md
-
-      - name: Get latest report
-        id: last_report
-        run: |
-          cd ${{ env.REPORTS_PATH }}
-          latest="$(readlink -f $(ls -tp | grep -v /$ | head -1))"
-          echo "latest=$latest" >> $GITHUB_OUTPUT
 
       - name: Send mail
         uses: dawidd6/action-send-mail@v3
