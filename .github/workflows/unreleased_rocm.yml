@@ -248,7 +248,7 @@ jobs:
           cd ${{ env.TEST_RESULTS_PATH }}
           ACCURACY=$(ls -dt accuracy* | head -1)
           echo "last_test=$ACCURACY" >> $GITHUB_OUTPUT
-          mv ${{ env.TEST_RESULTS_PATH }}/$ACCURACY/results.md ${{ env.TEST_RESULTS_PATH }}/$ACCURACY/accuracy.md
+          sudo mv ${{ env.TEST_RESULTS_PATH }}/$ACCURACY/results.md ${{ env.TEST_RESULTS_PATH }}/$ACCURACY/accuracy.md
 
       - name: Get latest report
         id: last_report
