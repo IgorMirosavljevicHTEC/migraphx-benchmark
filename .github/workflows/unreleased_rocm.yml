@@ -176,15 +176,15 @@ jobs:
       #    cd $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts
       #    ./build_migraphx_docker.sh ${{ inputs.benchmark_utils_repo }} ${{ github.repository }} ${{ env.BRANCH_NAME }}
 
-      #- name: Docker build
-      #  run: >
-      #    cd $GITHUB_WORKSPACE/${{ env.UTILS_DIR }} && docker build --no-cache
-      #    --build-arg BRANCH=${{ env.BRANCH_NAME }} 
-      #    --build-arg DOCKERBASE=unreleased_rocm_migraphx:${{ inputs.unreleased_rocm }}
-      #    --build-arg MIOPENTUNE=${{ env.MIOPENTUNE }}
-      #    --build-arg benchmark_utils_repo=${{ inputs.benchmark_utils_repo }}
-      #    -t "migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }}" 
-      #    -f dockerfiles/Daily.Dockerfile .
+      - name: Docker build
+        run: >
+          cd $GITHUB_WORKSPACE/${{ env.UTILS_DIR }} && docker build --no-cache
+          --build-arg BRANCH=${{ env.BRANCH_NAME }} 
+          --build-arg DOCKERBASE=unreleased_rocm_migraphx:${{ inputs.unreleased_rocm }}
+          --build-arg MIOPENTUNE=${{ env.MIOPENTUNE }}
+          --build-arg benchmark_utils_repo=${{ inputs.benchmark_utils_repo }}
+          -t "migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }}" 
+          -f dockerfiles/Daily.Dockerfile .
 
       - name: Run performance tests
         run: >
