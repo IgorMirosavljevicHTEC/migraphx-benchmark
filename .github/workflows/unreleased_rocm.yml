@@ -197,7 +197,6 @@ jobs:
           -e USE_RBUILD=1
           -e TEST_RESULTDIR=/data/test-results/unreleased-rocm
           -e TEST_RESULTS_PATH=/data/test-results/unreleased-rocm
-          -e TARGETOPT="--gpu --exhaustive-tune"
           --device=/dev/dri
           --device=/dev/kfd
           --network=host
@@ -209,7 +208,7 @@ jobs:
           --workdir /migraphx/sh
           migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }} /bin/bash -c "./build_migraphx.sh && ./performance_tests.sh ${{ inputs.model_timeout }}"
 
-        #
+        #-e TARGETOPT="--gpu --exhaustive-tune"
       - name: Checkout report's repo
         uses: actions/checkout@v4.1.1
         with:
