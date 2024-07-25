@@ -153,11 +153,8 @@ jobs:
       - name: Update Dockerfile
         run: |
           cd $GITHUB_WORKSPACE
-          pwd
-          ls
           UNRELEASED=${{inputs.unreleased_rocm}}
           ROCM_VERSION=".apt_$UNRELEASED"
-          echo $ROCM_VERSION
           sed -i "s|\(http://repo.radeon.com/rocm/apt/\)[^/]*\(/ jammy main > /etc/apt/sources.list.d/rocm.list\)|\1$ROCM_VERSION\2|g" Dockerfile    
       
       - name: ROCm base build
