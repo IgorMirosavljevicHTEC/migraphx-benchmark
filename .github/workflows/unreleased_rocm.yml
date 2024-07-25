@@ -160,21 +160,21 @@ jobs:
           echo $ROCM_VERSION
           sed -i "s|\(http://repo.radeon.com/rocm/apt/\)[^/]*\(/ jammy main > /etc/apt/sources.list.d/rocm.list\)|\1$ROCM_VERSION\2|g" Dockerfile    
       
-      #- name: ROCm base build
-      #  run: |
-      #    cd $GITHUB_WORKSPACE
-      #    docker build -t unreleased_rocm:${{inputs.unreleased_rocm}} .
+      - name: ROCm base build
+        run: |
+          cd $GITHUB_WORKSPACE
+          docker build -t unreleased_rocm:${{inputs.unreleased_rocm}} .
       
-      #- name: Build upon ROCm base
-      #  env:
-      #    ROCM_RELEASE: ${{ inputs.rocm_release }}
-      #    ROCM_BASE: ${{ env.DOCKERBASE }}
-      #    DOCKERIMAGE: unreleased_rocm_migraphx:${{ inputs.unreleased_rocm }}
-      #    BUILD_NAVI: 0
-      #    TOKEN: ${{ secrets.gh_token }}
-      #  run: |
-      #    cd $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts
-      #    ./build_migraphx_docker.sh ${{ inputs.benchmark_utils_repo }} ${{ github.repository }} ${{ env.BRANCH_NAME }}
+      - name: Build upon ROCm base
+        env:
+          ROCM_RELEASE: ${{ inputs.rocm_release }}
+          ROCM_BASE: ${{ env.DOCKERBASE }}
+          DOCKERIMAGE: unreleased_rocm_migraphx:${{ inputs.unreleased_rocm }}
+          BUILD_NAVI: 0
+          TOKEN: ${{ secrets.gh_token }}
+        run: |
+          cd $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts
+          ./build_migraphx_docker.sh ${{ inputs.benchmark_utils_repo }} ${{ github.repository }} ${{ env.BRANCH_NAME }}
 
       - name: Docker build
         run: >
@@ -197,6 +197,7 @@ jobs:
           -e USE_RBUILD=1
           -e TEST_RESULTDIR=/data/test-results/unreleased-rocm
           -e TEST_RESULTS_PATH=/data/test-results/unreleased-rocm
+          -e TARGETOPT="--gpu --exhaustive-tune"
           --device=/dev/dri
           --device=/dev/kfd
           --network=host
@@ -208,7 +209,6 @@ jobs:
           --workdir /migraphx/sh
           migraphx-rocm:${{ inputs.unreleased_rocm }}-${{ steps.git_sha.outputs.git_sha }} /bin/bash -c "./build_migraphx.sh && ./performance_tests.sh ${{ inputs.model_timeout }}"
 
-        #-e TARGETOPT="--gpu --exhaustive-tune"
       - name: Checkout report's repo
         uses: actions/checkout@v4.1.1
         with:
