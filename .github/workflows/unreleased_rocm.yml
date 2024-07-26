@@ -72,6 +72,7 @@ jobs:
     name: Unreleased ROCm - MIGraphX performance
     if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip bot checks') }}
     runs-on: [self-hosted,performance]
+    timeout-minutes: 3600
     outputs:
       git_sha: ${{ steps.git_sha.outputs.git_sha }}
     steps:
