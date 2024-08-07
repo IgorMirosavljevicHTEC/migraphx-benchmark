@@ -184,6 +184,7 @@ jobs:
           rm hashes.txt
           echo $rocm_hash
           echo "rocm_hash=$HASH" >> $GITHUB_OUTPUT
+          echo "rocm_hash=$HASH" >> $GITHUB_ENV
       
       - name: Check image hash
         id: check_hash
