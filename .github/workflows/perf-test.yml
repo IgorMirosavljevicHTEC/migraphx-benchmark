@@ -187,6 +187,7 @@ jobs:
       - name: Check image hash
         id: check_hash
         run: |
+          echo ${{ env.HASH }}
           echo "DOCKERBASE=rocm-migraphx:${{ inputs.rocm_release }}-${{ steps.hash.outputs.rocm_hash}}" >> $GITHUB_ENV
           if [[ docker images -q "rocm-migraphx:${{ inputs.rocm_release }}-${{ env.HASH }}" ]]; then
             echo "Hashes match, continue with existing image"
