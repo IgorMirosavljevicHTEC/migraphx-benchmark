@@ -189,12 +189,12 @@ jobs:
         run: |
           echo ${{ env.HASH }}
           echo "DOCKERBASE=rocm-migraphx:${{ inputs.rocm_release }}-${{ env.HASH }}" >> $GITHUB_ENV
-          if [[ $(docker images -q "rocm-migraphx:${{ inputs.rocm_release }}-${{ env.HASH }}") ]]; then
-            echo "Hashes match, continue with existing image"
-            echo "image=false" >> $GITHUB_ENV
-          else 
+          if [ -z "$(docker images -q rocm-migraphx:${{ inputs.rocm_release }}-${{ env.HASH }})" ]; then
             echo "Hashes not match, base ROCm image will be rebuilt"
             echo "image=true" >> $GITHUB_ENV
+          else 
+            echo "Hashes match, continue with existing image"
+            echo "image=false" >> $GITHUB_ENV
           fi
 
       - name: Rebuild ROCm base
