@@ -64,7 +64,6 @@ env:
   TEST_RESULTS_PATH: /usr/share/migraphx/${{ inputs.organization }}/test-results
   MIGRAPHX_PATH: /usr/share/migraphx/${{ inputs.organization }}
   PERFORMANCE_DIR: performance-backup
-  HASH: init
 
 
 jobs:
@@ -183,8 +182,7 @@ jobs:
           rocm_hash=$(md5sum hashes.txt | awk '{print $1}' | head -c 6)
           rm hashes.txt
           echo $rocm_hash
-          echo "rocm_hash=$HASH" >> $GITHUB_OUTPUT
-          echo "rocm_hash=$HASH" >> $GITHUB_ENV
+          echo "HASH=$rocm_hash" >> $GITHUB_ENV
       
       - name: Check image hash
         id: check_hash
