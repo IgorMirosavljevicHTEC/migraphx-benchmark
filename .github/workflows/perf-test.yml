@@ -49,8 +49,9 @@ on:
 env:
   UTILS_DIR: benchmark-utils
   REPORTS_DIR: migraphx-reports
-  DOCKERBASE: rocm-migraphx:${{ inputs.rocm_release }}-htec
+  DOCKERBASE: rocm-migraphx:${{ inputs.rocm_release }}
   MIOPENTUNE: miopen-dbs/rocm${{ inputs.rocm_release }}
+  ROCM_BASE: rocm/dev-ubuntu-20.04:${{ inputs.rocm_release }}
   MAIL_TO: igor.mirosavljevic@htecgroup.com
   MAIL_CC: igor.mirosavljevic@htecgroup.com
   MAIL_FROM: GH Actions
@@ -142,7 +143,7 @@ jobs:
       - name: Update Mailing list based on organization
         if: ${{ inputs.organization == 'HTEC' }}
         run: |
-          echo "MAIL_TO=$(echo "igor.mirosavljevic@htecgroup.com,djordje.petrovic@htecgroup.com,milos.miljanovic@htecgroup.com,pavle.jacovic@htecgroup.com")" >> $GITHUB_ENV
+          echo "MAIL_TO=$(echo "igor.mirosavljevic@htecgroup.com" >> $GITHUB_ENV
           echo "MAIL_CC= " >> $GITHUB_ENV
 
       - name: Update PR env
@@ -165,24 +166,45 @@ jobs:
         id: git_sha
         run: |
           cd $GITHUB_WORKSPACE
-          #SHA=$(git log | head -1 | awk '{print $2}' | cut -c 1-6)
           SHA=$(git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
           if [ -z "$SHA" ]; then
             SHA=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
           fi
           echo "git_sha=$SHA" >> $GITHUB_OUTPUT
-      
-      - name: SHA
-        run: |
-          echo "trigger SHA: $GITHUB_SHA"
-          git log | head -5
-          git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6
-          commit_id=$(git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
-          if [ -z "$commit_id" ]; then
-            commit_id=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
-          fi
-          echo $commit_id
 
+      - name: Calculate HASH
+        id: hash
+        run: |
+          cd $GITHUB_WORKSPACE
+          md5hash Dockerfile >> hashes.txt
+          md5hash requirements.txt >> hashes.txt
+          md5hash dev-requirements.txt >> hashes.txt
+          rocm_hash=$(md5hash hashes.txt | awk '{print $1}' | head -c 6)
+          rm hashes.txt
+          echo "rocm_hash=$HASH" >> $GITHUB_OUTPUT
+      
+      - name: Check image hash
+        id: check_hash
+        run: |
+          echo "DOCKERBASE=rocm-migraphx:${{ inputs.rocm_release }}-${{ steps.hash.outputs.rocm_hash}}" >> $GITHUB_ENV
+          if [[ docker images -q "rocm-migraphx:${{ inputs.rocm_release }}-${{ steps.hash.outputs.rocm_hash}}" ]]; then
+            echo "Hashes match, continue with existing image"
+          else 
+            echo "Hashes not match, base ROCm image will be rebuilt"
+            echo "image=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Rebuild ROCm base
+        if: ${{ needs.check_hash.outputs.image == 'true' }}
+        env:
+          ROCM_RELEASE: ${{ inputs.rocm_release }}
+          ROCM_BASE: ${{ env.ROCM_BASE }}
+          DOCKERIMAGE: rocm_migraphx:${{ inputs.rocm_release }}-${{ steps.hash.outputs.rocm_hash}}
+          BUILD_NAVI: 0
+          TOKEN: ${{ secrets.gh_token }}
+        run: |
+          cd $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts
+          ./build_migraphx_docker.sh ${{ inputs.benchmark_utils_repo }} ${{ github.repository }} ${{ env.BRANCH_NAME }}
 
       - name: Docker build
         if: ${{ github.event.action != 'closed' }}
