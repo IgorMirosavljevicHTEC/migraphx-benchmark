@@ -197,6 +197,7 @@ jobs:
           fi
 
       - name: Rebuild ROCm base
+        needs: check_hash
         if: ${{ needs.check_hash.outputs.image == 'true' }}
         env:
           ROCM_RELEASE: ${{ inputs.rocm_release }}
