@@ -202,7 +202,7 @@ jobs:
         env:
           ROCM_RELEASE: ${{ inputs.rocm_release }}
           ROCM_BASE: ${{ env.ROCM_BASE }}
-          DOCKERIMAGE: rocm_migraphx:${{ inputs.rocm_release }}-${{ steps.hash.outputs.rocm_hash}}
+          DOCKERIMAGE: rocm_migraphx:${{ inputs.rocm_release }}-${{ env.HASH }}
           BUILD_NAVI: 0
           TOKEN: ${{ secrets.gh_token }}
         run: |
