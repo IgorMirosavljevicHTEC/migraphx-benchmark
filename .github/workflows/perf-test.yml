@@ -195,9 +195,10 @@ jobs:
             echo "Hashes not match, base ROCm image will be rebuilt"
             echo "image=true" >> $GITHUB_OUTPUT
           fi
+        outputs:
+          image: ${{ steps.check_hash.outputs.image }}
 
       - name: Rebuild ROCm base
-        needs: check_hash
         if: ${{ needs.check_hash.outputs.image == 'true' }}
         env:
           ROCM_RELEASE: ${{ inputs.rocm_release }}
