@@ -158,7 +158,8 @@ jobs:
           ROCM_VERSION=".apt_$UNRELEASED"
           sed -i "s|\(http://repo.radeon.com/rocm/apt/\)[^/]*\(/ jammy main > /etc/apt/sources.list.d/rocm.list\)|\1$ROCM_VERSION\2|g" Dockerfile
           sed -i '/^ENV BUILD_NAVI=${build_navi}$/a RUN add-apt-repository ppa:deadsnakes/ppa' Dockerfile
-      
+          cat Dockerfile
+          
       - name: ROCm base build
         run: |
           cd $GITHUB_WORKSPACE
