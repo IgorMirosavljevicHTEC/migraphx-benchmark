@@ -310,6 +310,7 @@ jobs:
           header: performance
           GITHUB_TOKEN: ${{ secrets.gh_token }}
           path: ${{ github.workspace }}/${{ env.UTILS_DIR }}/scripts/temp.md
+          recreate: true
 
       - name: Get latest accuracy results
         id: accuracy
