@@ -168,7 +168,6 @@ jobs:
         id: git_sha
         run: |
           cd $GITHUB_WORKSPACE
-          git checkout $BRANCH_NAME
           SHA=$(git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
           if [ -z "$SHA" ]; then
             SHA=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
@@ -176,15 +175,16 @@ jobs:
           echo "SHA=================="
           echo $SHA
           echo "git_sha=$SHA" >> $GITHUB_OUTPUT
+          
       
       - name: SHA
         run: |
           echo "trigger SHA: $GITHUB_SHA"
-          git log | head -5
-          git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6
-          commit_id=$(git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
+          git log $BRANCH_NAME| head -5
+          git log $BRANCH_NAME| head -5 | grep Merge | awk '{print $2}' | cut -c 1-6
+          commit_id=$(git log $BRANCH_NAME| head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
           if [ -z "$commit_id" ]; then
-            commit_id=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
+            commit_id=$(git log $BRANCH_NAME| head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
           fi
           echo "commit_id================"
           echo $commit_id
