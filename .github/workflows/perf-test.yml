@@ -180,6 +180,7 @@ jobs:
       - name: SHA
         run: |
           echo "trigger SHA: $GITHUB_SHA"
+          git fetch
           git log $BRANCH_NAME| head -5
           git log $BRANCH_NAME| head -5 | grep Merge | awk '{print $2}' | cut -c 1-6
           commit_id=$(git log $BRANCH_NAME| head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
