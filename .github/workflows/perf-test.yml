@@ -164,10 +164,23 @@ jobs:
           path: ${{ env.UTILS_DIR }}
           token: ${{ secrets.gh_token }}
 
+      - name: Calculate HASH
+        id: hash
+        run: |
+          cd $GITHUB_WORKSPACE
+          md5sum Dockerfile >> hashes.txt
+          md5sum requirements.txt >> hashes.txt
+          md5sum dev-requirements.txt >> hashes.txt
+          rocm_hash=$(md5sum hashes.txt | awk '{print $1}' | head -c 6)
+          rm hashes.txt
+          echo $rocm_hash
+          echo "HASH=$rocm_hash" >> $GITHUB_ENV
+      
       - name: Get git SHA
         id: git_sha
         run: |
           cd $GITHUB_WORKSPACE
+          git checkout $BRANCH_NAME
           SHA=$(git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
           if [ -z "$SHA" ]; then
             SHA=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
@@ -189,18 +202,6 @@ jobs:
           fi
           echo "commit_id================"
           echo $commit_id
-          
-      - name: Calculate HASH
-        id: hash
-        run: |
-          cd $GITHUB_WORKSPACE
-          md5sum Dockerfile >> hashes.txt
-          md5sum requirements.txt >> hashes.txt
-          md5sum dev-requirements.txt >> hashes.txt
-          rocm_hash=$(md5sum hashes.txt | awk '{print $1}' | head -c 6)
-          rm hashes.txt
-          echo $rocm_hash
-          echo "HASH=$rocm_hash" >> $GITHUB_ENV
       
       - name: Check image hash
         id: check_hash
