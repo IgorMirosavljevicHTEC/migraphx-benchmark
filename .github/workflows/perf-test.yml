@@ -398,5 +398,5 @@ jobs:
         run: >
           docker run
           -v ${{ env.MIGRAPHX_PATH }}:/data/migraphx/${{ inputs.organization }}
-          rocm-migraphx:${{ inputs.rocm_release }} bash -c "rm -rf ${{ env.TEST_RESULTS_PATH }}"
+          ${{ env.DOCKERBASE }} bash -c "rm -rf ${{ env.TEST_RESULTS_PATH }}"
   
