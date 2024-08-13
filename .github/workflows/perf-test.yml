@@ -400,3 +400,7 @@ jobs:
           -v ${{ env.MIGRAPHX_PATH }}:/data/migraphx/${{ inputs.organization }}
           ${{ env.DOCKERBASE }} bash -c "rm -rf ${{ env.TEST_RESULTS_PATH }}"
   
+      - name: Clean closed PR data cli
+        if: ${{ github.event.action == 'closed' }}
+        run: |
+          rm -rf ${{ env.TEST_RESULTS_PATH }}
