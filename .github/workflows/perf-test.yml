@@ -403,4 +403,4 @@ jobs:
       - name: Clean closed PR data cli
         if: ${{ github.event.action == 'closed' }}
         run: |
-          rm -rf ${{ env.TEST_RESULTS_PATH }}
+          sudo rm -rf ${{ env.TEST_RESULTS_PATH }}
