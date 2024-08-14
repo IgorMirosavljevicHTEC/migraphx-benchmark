@@ -179,7 +179,13 @@ jobs:
           rm hashes.txt
           echo $rocm_hash
           echo "HASH=$rocm_hash" >> $GITHUB_ENV
-      
+
+      - name: HASH
+        run: |
+          echo "imagetag=${{hashFiles('**/hip-clang.docker', '**/*requirements.txt', '**/requirements-py.txt', '**/install_prereqs.sh', '**/rbuild.ini')}}" >> $GITHUB_OUTPUT
+          echo ${{ env.imagetag }}
+          echo ${{ env.imagetag }} | cut -c 1-6
+        
       - name: Get git SHA
         if: ${{ github.event.action != 'closed' }}
         id: git_sha
