@@ -183,14 +183,19 @@ jobs:
       - name: HASH
         run: |
           echo "imagetag=${{hashFiles('**/hip-clang.docker', '**/*requirements.txt', '**/requirements-py.txt', '**/install_prereqs.sh', '**/rbuild.ini')}}" >> $GITHUB_ENV
+          echo "imagetag"
           echo ${{ env.imagetag }}
           hash_check=$(echo ${{hashFiles('**/hip-clang.docker', '**/*requirements.txt', '**/requirements-py.txt', '**/install_prereqs.sh', '**/rbuild.ini')}} | cut -c 1-6)
+          echo "hash_check"
           echo $hash_check
           h_c=${{hashFiles('**/hip-clang.docker', '**/*requirements.txt', '**/requirements-py.txt', '**/install_prereqs.sh', '**/rbuild.ini')}} | cut -c 1-6
+          echo "h_c"
           echo $h_c
           h_ct=${{hashFiles('**/hip-clang.docker', '**/*requirements.txt', '**/requirements-py.txt', '**/install_prereqs.sh', '**/rbuild.ini')}}
+          echo "h_ct"
           echo $h_ct
           h_c2=$(echo $h_ct | cut -c 1-6)
+          echo "h_c2"
           echo $h_c2
           
       - name: Get git SHA
