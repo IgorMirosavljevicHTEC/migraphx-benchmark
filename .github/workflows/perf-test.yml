@@ -186,10 +186,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           git checkout $BRANCH_NAME
-          SHA=$(git log | head -5 | grep Merge | awk '{print $2}' | cut -c 1-6)
-          if [ -z "$SHA" ]; then
-            SHA=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
-          fi
+          SHA=$(git log | head -5 | grep -m 1 "^commit" | awk '{print $2}' | cut -c 1-6)
           echo "SHA=================="
           echo $SHA
           echo "git_sha=$SHA" >> $GITHUB_OUTPUT
