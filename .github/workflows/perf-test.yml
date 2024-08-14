@@ -182,7 +182,7 @@ jobs:
 
       - name: HASH
         run: |
-          hash_check=$(echo ${{hashFiles('**/hip-clang.docker', '**/*requirements.txt', '**/requirements-py.txt', '**/install_prereqs.sh', '**/rbuild.ini')}} | cut -c 1-6)
+          hash_check=$(echo ${{hashFiles('**/Dockerfile', '**/hip-clang.docker', '**/*requirements.txt', '**/requirements-py.txt', '**/install_prereqs.sh', '**/rbuild.ini')}} | cut -c 1-6)
           echo "hash_check"
           echo $hash_check
           echo "HASH_CHECK=$hash_check" >> $GITHUB_ENV
@@ -214,6 +214,8 @@ jobs:
           fi
           echo "commit_id================"
           echo $commit_id
+          echo "HASH from env"
+          echo ${{ env.HASH_CHECK }}
       
       - name: Check image hash
         if: ${{ github.event.action != 'closed' }}
