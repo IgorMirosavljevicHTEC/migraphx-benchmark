@@ -157,6 +157,13 @@ jobs:
           echo "BRANCH_NAME=$sanitized_branch_name" >> $GITHUB_ENV
           echo "TEST_RESULTS_PATH=$(echo "$TEST_RESULTS_PATH-$PR_ID")" >> $GITHUB_ENV
       # echo "BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+      - name: Debug branch names
+        run: |
+          echo "HEAD ref: ${{ github.head_ref }}
+          echo "GITHUB ref: ${{ github.ref }}
+          echo "Current branches in repo:"
+          git branch -a
+      
       - name: Checkout code
         uses: actions/checkout@v4.1.1
         with:
