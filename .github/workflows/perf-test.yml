@@ -161,7 +161,8 @@ jobs:
         run: |
           echo "HEAD_REF: ${{ github.head_ref }}"
           echo "GITHUB_REF: ${{ github.ref }}"
-          echo "EVENT ref: ${{ github.event.pull_request_target.head.repo.full_name }}"
+          echo "EVENT_PRT: ${{ github.event.pull_request_target.head.repo.full_name }}"
+          echo "EVENT_PR: ${{ github.event.pull_request.head.repo.full_name }}"
           echo "BASE_REF: ${{ github.base_ref }}"
           echo "REPOSITORY: ${{ github.repository }}"
       
