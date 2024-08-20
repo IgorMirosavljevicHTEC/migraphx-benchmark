@@ -159,9 +159,11 @@ jobs:
       # echo "BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
       - name: Debug branch names
         run: |
-          echo "HEAD ref: ${{ github.head_ref }}"
-          echo "GITHUB ref: ${{ github.ref }}"
+          echo "HEAD_REF: ${{ github.head_ref }}"
+          echo "GITHUB_REF: ${{ github.ref }}"
           echo "EVENT ref: ${{ github.event.pull_request_target.head.repo.full_name }}"
+          echo "BASE_REF: ${{ github.base_ref }}"
+          echo "REPOSITORY: ${{ github.repository }}"
       
       - name: Checkout code
         uses: actions/checkout@v4.1.1
