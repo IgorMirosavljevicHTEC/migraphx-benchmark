@@ -239,7 +239,7 @@ jobs:
           else
             flagoptions="${{ inputs.flags }}"
           fi 
-          python3 $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/unreleased_rocm_comment.py -t ${TEST_RESULTS_PATH} -n 1 $flagoptions -v ${{ inputs.unreleased_rocm }} 
+          python3 $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/unreleased_rocm_comment.py -t ${TEST_RESULTS_PATH} -n ${{ inputs.result_number }} $flagoptions -v ${{ inputs.unreleased_rocm }} 
           mv $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/temp.md $GITHUB_WORKSPACE/${{ env.UTILS_DIR }}/scripts/performance.md
 
       - name: Get latest accuracy results
