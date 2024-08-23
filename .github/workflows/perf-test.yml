@@ -319,14 +319,14 @@ jobs:
         run: |
           mkdir -p $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}
           cp -r ${{ env.TEST_RESULTS_PATH }}/perf-*/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}
-          cp -r ${{ env.TEST_RESULTS_PATH }}/${{ steps.accuracy.outputs.last_test }} $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}
+          cp -r ${{ env.TEST_RESULTS_PATH }}/${{ steps.accuracy.outputs.last_test }}/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}/accuracy_logs
 
       - name: Copy performance results to repo - PRs
         if: ${{ github.event_name != 'schedule' && github.event_name == 'pull_request_target' && github.event.action != 'closed'}}
         run: | 
           mkdir -p $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/PRs/PR-$PR_ID/${{ steps.git_sha.outputs.git_sha }}
           cp -r ${{ env.TEST_RESULTS_PATH }}/perf-*/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/PRs/PR-$PR_ID/${{ steps.git_sha.outputs.git_sha }}
-          cp -r ${{ env.TEST_RESULTS_PATH }}/${{ steps.accuracy.outputs.last_test }} $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/PRs/PR-$PR_ID/${{ steps.git_sha.outputs.git_sha }}
+          cp -r ${{ env.TEST_RESULTS_PATH }}/${{ steps.accuracy.outputs.last_test }}/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/PRs/PR-$PR_ID/${{ steps.git_sha.outputs.git_sha }}/accuracy_logs
       
       - name: Push results to repo
         continue-on-error: true
