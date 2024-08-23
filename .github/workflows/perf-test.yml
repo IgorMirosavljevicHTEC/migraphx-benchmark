@@ -303,17 +303,27 @@ jobs:
           -r '${{ env.REPORTS_PATH }}'
           cp -r ${{ env.REPORTS_PATH }}/results-* $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/nightly_reports
       
+      - name: Get latest accuracy results
+        id: accuracy
+        if: ${{ github.event.action != 'closed' }}
+        run: |
+          cd ${{ env.TEST_RESULTS_PATH }}
+          ACCURACY=$(ls -dt accuracy* | head -1)
+          echo "last_test=$ACCURACY" >> $GITHUB_OUTPUT
+      
       - name: Copy performance results to repo - develop - nightly or manual
         if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
         run: |
           mkdir -p $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}
           cp -r ${{ env.TEST_RESULTS_PATH }}/perf-*/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}
+          cp -r ${{ env.TEST_RESULTS_PATH }}/${{ steps.accuracy.outputs.last_test }}/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/develop/${{ steps.git_sha.outputs.git_sha }}
 
       - name: Copy performance results to repo - PRs
         if: ${{ github.event_name != 'schedule' && github.event_name == 'pull_request_target' && github.event.action != 'closed'}}
         run: | 
           mkdir -p $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/PRs/PR-$PR_ID/${{ steps.git_sha.outputs.git_sha }}
           cp -r ${{ env.TEST_RESULTS_PATH }}/perf-*/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/PRs/PR-$PR_ID/${{ steps.git_sha.outputs.git_sha }}
+          cp -r ${{ env.TEST_RESULTS_PATH }}/${{ steps.accuracy.outputs.last_test }}/. $GITHUB_WORKSPACE/${{ env.REPORTS_DIR }}/performance_results/PRs/PR-$PR_ID/${{ steps.git_sha.outputs.git_sha }}
       
       - name: Push results to repo
         continue-on-error: true
@@ -345,14 +355,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.gh_token }}
           path: ${{ github.workspace }}/${{ env.UTILS_DIR }}/scripts/temp.md
           recreate: true
-
-      - name: Get latest accuracy results
-        id: accuracy
-        if: ${{ github.event.action != 'closed' }}
-        run: |
-          cd ${{ env.TEST_RESULTS_PATH }}
-          ACCURACY=$(ls -dt accuracy* | head -1)
-          echo "last_test=$ACCURACY" >> $GITHUB_OUTPUT
 
       - name: Create accuracy comment on PR
         if: ${{ github.event_name != 'schedule' && github.event_name == 'pull_request_target' && github.event.action != 'closed'}}
